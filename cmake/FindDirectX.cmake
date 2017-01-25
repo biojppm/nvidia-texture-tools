@@ -30,9 +30,9 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF (DX10_INCLUDE_PATH)
-	SET( DX10_FOUND 1 CACHE STRING "Set to 1 if CG is found, 0 otherwise")
+        SET( DX10_FOUND 1 CACHE STRING "Set to 1 if DX10 is found, 0 otherwise")
 ELSE (DX10_INCLUDE_PATH)
-	SET( DX10_FOUND 0 CACHE STRING "Set to 1 if CG is found, 0 otherwise")
+        SET( DX10_FOUND 0 CACHE STRING "Set to 1 if DX10 is found, 0 otherwise")
 ENDIF (DX10_INCLUDE_PATH)
 
 MARK_AS_ADVANCED( DX10_FOUND )

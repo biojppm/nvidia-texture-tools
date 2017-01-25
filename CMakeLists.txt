@@ -11,17 +11,24 @@ if(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(CMAKE_COMPILER_IS_GNUCC)
 
 IF(WIN32)
-	# gnuwin32 paths:
-	SET(GNUWIN32_PATH "${NV_SOURCE_DIR}/extern/gnuwin32")
-	SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${GNUWIN32_PATH}/include")
-	SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${GNUWIN32_PATH}/lib")
-	
-	# Set GLUT path:
-	SET(GLUT_ROOT_DIR "${NV_SOURCE_DIR}/extern/glut")
 
-	# Set FreeImage path:
-	SET(FREEIMAGE_ROOT_DIR "${NV_SOURCE_DIR}/extern/FreeImage")
-	
+    option(USE_SHIPPED_LIBS
+        "Use the zlib,png,jpg,tiff libraries shipped with nvtt. When off, CMake will search these libraries elsewhere."
+        ON)
+
+    if(USE_SHIPPED_LIBS)
+        # gnuwin32 paths:
+        SET(GNUWIN32_PATH "${NV_SOURCE_DIR}/extern/gnuwin32")
+        SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "${GNUWIN32_PATH}/include")
+        SET(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "${GNUWIN32_PATH}/lib")
+
+        # Set GLUT path:
+        SET(GLUT_ROOT_DIR "${NV_SOURCE_DIR}/extern/glut")
+
+        # Set FreeImage path:
+        SET(FREEIMAGE_ROOT_DIR "${NV_SOURCE_DIR}/extern/FreeImage")
+    endif()
+
 ENDIF(WIN32)
 
 INCLUDE(${NV_CMAKE_DIR}/OptimalOptions.cmake)

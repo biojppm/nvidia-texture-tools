@@ -7,44 +7,58 @@
 # OPENEXR_LIBRARIES = libraries that are needed to use OpenEXR.
 # 
 
-INCLUDE(FindZLIB)
+find_package(ZLIB REQUIRED)
 
+macro(report_found var what)
+    #if(${var})
+    #    message(STATUS "OpenEXR: found ${what}: ${${var}}")
+    #else()
+    #    message(STATUS "OpenEXR: could not find ${what}")
+    #endif()
+endmacro()
 
 IF(ZLIB_FOUND)
 
-	SET(LIBRARY_PATHS 
-		/usr/lib
-		/usr/local/lib
-		/sw/lib
-		/opt/local/lib
-		$ENV{PROGRAM_FILES}/OpenEXR/lib/static)
+        SET(LIBRARY_PATHS
+            /usr/lib
+            /usr/local/lib
+            /sw/lib
+            /opt/local/lib
+            $ENV{PROGRAM_FILES}/OpenEXR/lib/static)
 
 	FIND_PATH(OPENEXR_INCLUDE_PATH ImfRgbaFile.h
-		PATH_SUFFIXES OpenEXR
-		/usr/include
-		/usr/local/include
-		/sw/include
-		/opt/local/include)
+            PATH_SUFFIXES "" OpenEXR
+            HINTS
+            /usr/include
+            /usr/local/include
+            /sw/include
+            /opt/local/include)
+        report_found(OPENEXR_INCLUDE_PATH "include path")
 
-	FIND_LIBRARY(OPENEXR_HALF_LIBRARY 
-		NAMES Half
-		PATHS ${LIBRARY_PATHS})
-  
-	FIND_LIBRARY(OPENEXR_IEX_LIBRARY 
-		NAMES Iex
-		PATHS ${LIBRARY_PATHS})
- 
+        FIND_LIBRARY(OPENEXR_HALF_LIBRARY
+            NAMES Half
+            )#HINTS ${LIBRARY_PATHS})
+        report_found(OPENEXR_HALF_LIBRARY "HALF library")
+
+        FIND_LIBRARY(OPENEXR_IEX_LIBRARY
+            NAMES Iex Iex-2_2
+            )#HINTS ${LIBRARY_PATHS})
+        report_found(OPENEXR_IEX_LIBRARY "IEX library")
+
 	FIND_LIBRARY(OPENEXR_IMATH_LIBRARY
-		NAMES Imath
-		PATHS ${LIBRARY_PATHS})
-  
+                NAMES Imath Imath-2_2
+                )#HINTS ${LIBRARY_PATHS})
+        report_found(OPENEXR_IMATH_LIBRARY "IMATH library")
+
 	FIND_LIBRARY(OPENEXR_ILMIMF_LIBRARY
-		NAMES IlmImf
-		PATHS ${LIBRARY_PATHS})
+                NAMES IlmImf IlmImf-2_2
+                )#HINTS ${LIBRARY_PATHS})
+        report_found(OPENEXR_ILMIMF_LIBRARY "ILMIMF library")
 
 	FIND_LIBRARY(OPENEXR_ILMTHREAD_LIBRARY
-		NAMES IlmThread
-		PATHS ${LIBRARY_PATHS})
+                NAMES IlmThread IlmThread-2_2
+                )#HINTS ${LIBRARY_PATHS})
+        report_found(OPENEXR_ILMTHREAD_LIBRARY "ILMTHREAD library")
 
 ENDIF(ZLIB_FOUND)
 

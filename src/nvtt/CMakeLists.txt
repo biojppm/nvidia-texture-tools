@@ -1,6 +1,8 @@
 PROJECT(nvtt)
 
-ADD_SUBDIRECTORY(squish)
+set(defs)
+
+add_subdirectory(squish)
 
 SET(NVTT_SRCS
     nvtt.h nvtt.cpp
@@ -21,7 +23,7 @@ SET(NVTT_SRCS
     CompressionOptions.h CompressionOptions.cpp
     InputOptions.h InputOptions.cpp
     OutputOptions.h OutputOptions.cpp
-    TaskDispatcher.h #TaskDispatcher.cpp
+    TaskDispatcher.h TaskDispatcher.cpp
     Surface.h Surface.cpp
     CubeSurface.h CubeSurface.cpp
     cuda/CudaUtils.h cuda/CudaUtils.cpp
@@ -30,32 +32,40 @@ SET(NVTT_SRCS
     cuda/CudaCompressorDXT.h cuda/CudaCompressorDXT.cpp)
 
 IF (CUDA_FOUND)
-    ADD_DEFINITIONS(-DHAVE_CUDA)
-    CUDA_COMPILE(CUDA_SRCS cuda/CompressKernel.cu)
-    SET(NVTT_SRCS ${NVTT_SRCS} ${CUDA_SRCS})
-    SET(LIBS ${LIBS} ${CUDA_LIBRARIES})
-    INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRS})
+    list(APPEND defs -DHAVE_CUDA)
+    cuda_compile(CUDA_SRCS cuda/CompressKernel.cu)
+    list(APPEND NVTT_SRCS ${CUDA_SRCS})
+    list(APPEND LIBS ${CUDA_LIBRARIES})
+    list(APPEND INCS ${CUDA_INCLUDE_DIRS})
 ENDIF (CUDA_FOUND)
 
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR})
+list(APPEND INCS ${CMAKE_CURRENT_SOURCE_DIR})
 
 ADD_DEFINITIONS(-DNVTT_EXPORTS)
 
-IF(NVTT_SHARED)	
+IF(NVTT_SHARED)
     ADD_LIBRARY(nvtt SHARED ${NVTT_SRCS})
+    target_compile_definitions(nvcore PUBLIC -DNVTT_SHARED=1)
 ELSE(NVTT_SHARED)
     ADD_LIBRARY(nvtt ${NVTT_SRCS})
 ENDIF(NVTT_SHARED)
 
-TARGET_LINK_LIBRARIES(nvtt ${LIBS} nvcore nvimage nvthread squish bc6h bc7 nvmath)
+TARGET_LINK_LIBRARIES(nvtt PUBLIC ${LIBS} nvcore nvimage nvthread squish bc6h bc7 nvmath)
+target_include_directories(nvtt
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:include/nvtt>
+    ${INCS})
 
-INSTALL(TARGETS nvtt 
+INSTALL(TARGETS nvtt
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib/static)
-
-INSTALL(FILES nvtt.h DESTINATION include/nvtt)
-
+install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
+    DESTINATION include/nvtt
+    FILES_MATCHING PATTERN "*.h")
 
 ADD_SUBDIRECTORY(tools)
-ADD_SUBDIRECTORY(tests)
+if(BUILD_TESTS)
+    ADD_SUBDIRECTORY(tests)
+endif()

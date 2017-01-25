@@ -4,4 +4,7 @@ SET(POSHLIB_SRCS
 	posh.h)
 
 ADD_LIBRARY(posh STATIC ${POSHLIB_SRCS})
-
+install(TARGETS posh
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib)
+install(FILES posh.h DESTINATION include)
