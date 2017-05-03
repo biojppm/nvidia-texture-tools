@@ -31,5 +31,5 @@ nv_add_target(nvmath LIBRARY ${NVIMAGE_SHARED}
     )
 
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
-    DESTINATION include/nvthread
+    DESTINATION include/nvmath
     FILES_MATCHING PATTERN "*.h")
