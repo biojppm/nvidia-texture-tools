@@ -44,27 +44,23 @@ IF(FREEIMAGE_FOUND)
 ENDIF(FREEIMAGE_FOUND)
 
 # targets
-ADD_DEFINITIONS(-DNVIMAGE_EXPORTS)
-
 IF(NVIMAGE_SHARED)
-    ADD_LIBRARY(nvimage SHARED ${IMAGE_SRCS})
-    target_compile_definitions(nvimage PUBLIC -DNVIMAGE_SHARED=1)
+    set(NVIMAGE_SHARED SHARED)
+    set(defs -DNVIMAGE_SHARED=1)
 ELSE(NVIMAGE_SHARED)
-    ADD_LIBRARY(nvimage ${IMAGE_SRCS})
+    unset(NVIMAGE_SHARED)
 ENDIF(NVIMAGE_SHARED)
 
-TARGET_LINK_LIBRARIES(nvimage ${LIBS} nvcore posh bc6h bc7 nvmath)
+nv_add_target(nvimage LIBRARY ${NVIMAGE_SHARED}
+    SRCS ${IMAGE_SRCS}
+    DEFS ${defs}
+    DEFS_PRIVATE -DNVIMAGE_EXPORTS
+    INC_DIRS include/nvimage
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    LIBS ${LIBS} nvcore posh bc6h bc7 nvmath
+    EXPORT nvttConfig
+    )
 
-target_include_directories(nvimage
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/nvimage>
-    ${INCS})
-
-INSTALL(TARGETS nvimage
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
     DESTINATION include/nvimage
     FILES_MATCHING PATTERN "*.h")

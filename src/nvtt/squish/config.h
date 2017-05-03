@@ -28,7 +28,11 @@
 
 // Set to 1 when building squish to use altivec instructions.
 #ifndef SQUISH_USE_ALTIVEC
-#	define SQUISH_USE_ALTIVEC defined(__VEC__)
+#   if defined(__VEC__)
+#	    define SQUISH_USE_ALTIVEC 1
+#   else
+#	    define SQUISH_USE_ALTIVEC 0
+#   endif
 #endif
 
 // Set to 1 when building squish to use sse instructions.

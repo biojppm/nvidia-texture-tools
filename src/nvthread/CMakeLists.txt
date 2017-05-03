@@ -9,27 +9,27 @@ SET(THREAD_SRCS
 	Thread.h Thread.cpp
 	ThreadPool.h ThreadPool.cpp)
 
-# targets
-ADD_DEFINITIONS(-DNVTHREAD_EXPORTS)
+find_package(Threads REQUIRED)
+list(APPEND LIBS ${CMAKE_THREAD_LIBS_INIT})
 
+# targets
 IF(NVTHREAD_SHARED)
-    ADD_LIBRARY(nvthread SHARED ${THREAD_SRCS})
-    target_compile_definitions(nvthread PUBLIC -DNVTHREAD_SHARED=1)
+    set(NVTHREAD_SHARED SHARED)
+    set(defs -DNVTHREAD_SHARED=1)
 ELSE(NVTHREAD_SHARED)
-    ADD_LIBRARY(nvthread ${THREAD_SRCS})
+    unset(NVTHREAD_SHARED)
 ENDIF(NVTHREAD_SHARED)
 
-TARGET_LINK_LIBRARIES(nvthread ${LIBS} nvcore)
+nv_add_target(nvthread LIBRARY ${NVTHREAD_SHARED}
+    SRCS ${THREAD_SRCS}
+    DEFS ${defs}
+    DEFS_PRIVATE -DNVTHREAD_EXPORTS
+    INC_DIRS include/nvthread
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    LIBS ${LIBS} nvcore
+    EXPORT nvttConfig
+    )
 
-target_include_directories(nvcore
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/nvthread>)
-
-INSTALL(TARGETS nvthread
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION lib
-	ARCHIVE DESTINATION lib/static)
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
     DESTINATION include/nvthread
     FILES_MATCHING PATTERN "*.h")

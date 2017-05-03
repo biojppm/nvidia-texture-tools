@@ -47,9 +47,16 @@ IF(NVTT_SHARED)
 	SET(NVIMAGE_SHARED TRUE)
 ENDIF(NVTT_SHARED)
 
+include(AddTarget)
+
 ADD_SUBDIRECTORY(extern)
 
 ADD_SUBDIRECTORY(src)
+
+install(EXPORT nvttConfig
+  #NAMESPACE example_lib::
+  DESTINATION lib/cmake/nvtt
+)
 
 # These files should only be installed when creating packages.
 INSTALL(FILES 

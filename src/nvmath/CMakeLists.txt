@@ -13,26 +13,23 @@ SET(MATH_SRCS
     Vector.h Vector.inl)
 
 # targets
-ADD_DEFINITIONS(-DNVMATH_EXPORTS)
-
 IF(NVMATH_SHARED)
-    ADD_LIBRARY(nvmath SHARED ${MATH_SRCS})
-    target_compile_definitions(nvmath PUBLIC -DNVCORE_SHARED=1)
+    set(NVMATH_SHARED SHARED)
+    set(defs -DNVMATH_SHARED=1)
 ELSE(NVMATH_SHARED)
-    ADD_LIBRARY(nvmath ${MATH_SRCS})
+    unset(NVMATH_SHARED)
 ENDIF(NVMATH_SHARED)
 
-TARGET_LINK_LIBRARIES(nvmath ${LIBS} nvcore)
+nv_add_target(nvmath LIBRARY ${NVIMAGE_SHARED}
+    SRCS ${MATH_SRCS}
+    DEFS ${defs}
+    DEFS_PRIVATE -DNVMATH_EXPORTS
+    INC_DIRS include/nvmath
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    LIBS ${LIBS} nvcore
+    EXPORT nvttConfig
+    )
 
-target_include_directories(nvcore
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/nvmath>)
-
-INSTALL(TARGETS nvmath
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
     DESTINATION include/nvthread
     FILES_MATCHING PATTERN "*.h")

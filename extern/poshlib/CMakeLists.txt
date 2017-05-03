@@ -3,8 +3,10 @@ SET(POSHLIB_SRCS
 	posh.c
 	posh.h)
 
-ADD_LIBRARY(posh STATIC ${POSHLIB_SRCS})
-install(TARGETS posh
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib)
+nv_add_target(posh LIBRARY
+    SRCS ${POSHLIB_SRCS}
+    INC_DIRS include
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    EXPORT nvttConfig
+    )
 install(FILES posh.h DESTINATION include)

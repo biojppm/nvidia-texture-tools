@@ -20,16 +20,6 @@ SET(CORE_SRCS
     Timer.h Timer.cpp
     Utils.h)
 
-# targets
-ADD_DEFINITIONS(-DNVCORE_EXPORTS)
-
-IF(NVCORE_SHARED)
-    ADD_LIBRARY(nvcore SHARED ${CORE_SRCS})
-    target_compile_definitions(nvcore PUBLIC -DNVCORE_SHARED=1)
-ELSE(NVCORE_SHARED)
-    ADD_LIBRARY(nvcore ${CORE_SRCS})
-ENDIF(NVCORE_SHARED)
-
 IF(UNIX)
     list(APPEND LIBS ${CMAKE_DL_LIBS})
 ENDIF(UNIX)
@@ -38,17 +28,24 @@ if (CMAKE_SYSTEM_NAME MATCHES "NetBSD")
     list(APPEND LIBS execinfo)
 endif()
 
-TARGET_LINK_LIBRARIES(nvcore ${LIBS})
+# targets
+IF(NVCORE_SHARED)
+    set(NVCORE_SHARED SHARED)
+    set(defs -DNVCORE_SHARED=1)
+ELSE(NVCORE_SHARED)
+    unset(NVCORE_SHARED)
+ENDIF(NVCORE_SHARED)
 
-target_include_directories(nvcore
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/nvcore>)
+nv_add_target(nvcore LIBRARY ${NVCORE_SHARED}
+    SRCS ${CORE_SRCS}
+    DEFS ${defs}
+    DEFS_PRIVATE -DNVCORE_EXPORTS
+    INC_DIRS include/nvcore
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    LIBS ${LIBS}
+    EXPORT nvttConfig
+    )
 
-INSTALL(TARGETS nvcore
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
     DESTINATION include/nvcore
     FILES_MATCHING PATTERN "*.h")

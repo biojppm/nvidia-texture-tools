@@ -41,26 +41,24 @@ ENDIF (CUDA_FOUND)
 
 list(APPEND INCS ${CMAKE_CURRENT_SOURCE_DIR})
 
-ADD_DEFINITIONS(-DNVTT_EXPORTS)
-
+# targets
 IF(NVTT_SHARED)
-    ADD_LIBRARY(nvtt SHARED ${NVTT_SRCS})
-    target_compile_definitions(nvcore PUBLIC -DNVTT_SHARED=1)
+    set(NVTT_SHARED SHARED)
+    set(defs -DNVTT_SHARED=1)
 ELSE(NVTT_SHARED)
-    ADD_LIBRARY(nvtt ${NVTT_SRCS})
+    unset(NVTT_SHARED)
 ENDIF(NVTT_SHARED)
 
-TARGET_LINK_LIBRARIES(nvtt PUBLIC ${LIBS} nvcore nvimage nvthread squish bc6h bc7 nvmath)
-target_include_directories(nvtt
-    PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:include/nvtt>
-    ${INCS})
+nv_add_target(nvtt LIBRARY ${NVTT_SHARED}
+    SRCS ${NVTT_SRCS}
+    DEFS ${defs}
+    DEFS_PRIVATE -DNVTT_EXPORTS
+    INC_DIRS include/nvtt
+    INC_DIRS_BUILD ${CMAKE_CURRENT_SOURCE_DIR}
+    LIBS ${LIBS} nvcore nvimage nvthread squish bc6h bc7 nvmath
+    EXPORT nvttConfig
+    )
 
-INSTALL(TARGETS nvtt
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib/static)
 install(DIRECTORY . #${CMAKE_CURRENT_SOURCE_DIRECTORY}
     DESTINATION include/nvtt
     FILES_MATCHING PATTERN "*.h")
