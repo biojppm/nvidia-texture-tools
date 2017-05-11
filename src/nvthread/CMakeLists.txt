@@ -11,8 +11,14 @@ SET(THREAD_SRCS
 
 # http://stackoverflow.com/questions/1620918/cmake-and-libpthread
 find_package(Threads REQUIRED)
-set(THREADS_PREFER_PTHREAD_FLAG ON)
-list(APPEND LIBS Threads::Threads)
+#set(THREADS_PREFER_PTHREAD_FLAG ON)
+#list(APPEND LIBS Threads::Threads)
+if(THREADS_HAVE_PTHREAD_ARG)
+    target_compile_options(PUBLIC my_app "-pthread")
+endif()
+if(CMAKE_THREAD_LIBS_INIT)
+    list(APPEND LIBS "${CMAKE_THREAD_LIBS_INIT}")
+endif()
 
 # targets
 IF(NVTHREAD_SHARED)
