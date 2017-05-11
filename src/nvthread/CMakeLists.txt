@@ -9,8 +9,10 @@ SET(THREAD_SRCS
 	Thread.h Thread.cpp
 	ThreadPool.h ThreadPool.cpp)
 
+# http://stackoverflow.com/questions/1620918/cmake-and-libpthread
 find_package(Threads REQUIRED)
-list(APPEND LIBS ${CMAKE_THREAD_LIBS_INIT})
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+list(APPEND LIBS Threads::Threads)
 
 # targets
 IF(NVTHREAD_SHARED)
